@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsMobilePhone, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-export class RequestUserList {
+export class UserList {
        @ApiProperty({
               name: 'page_index',
               description: '页码',
@@ -9,7 +9,6 @@ export class RequestUserList {
        @IsNumber()
        @IsNotEmpty({ message: '页码不能为空' })
        page_index: number;
-
 
        @ApiProperty({
               name: 'page_size',
@@ -31,7 +30,7 @@ export class RequestUserList {
        @IsString()
        id_card: string
 }
-export class AddUser {
+export class UserAdd {
        @ApiProperty({ uniqueItems: true, description: '手机号' })
        @IsNotEmpty({ message: '手机号不能为空' })
        @IsString()

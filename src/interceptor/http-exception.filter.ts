@@ -7,7 +7,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
               const ctx = host.switchToHttp();
               const response = ctx.getResponse<Response>();
               const request = ctx.getRequest(); // 获取请求对象
-              const path = request.route?.path || request.url; // 获取路由路径
+              const path = request.route?.path || request.originalUrl; // 更安全的方式
 
               let status = 500;
               let message = 'Internal server error';
@@ -17,7 +17,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
               }
 
               // 生产环境建议隐藏堆栈信息
-              console.error(`[${new Date().toISOString()}] Error: ${exception.stack}`);
+              if (process.env.NODE_ENV !== 'production') {
+                     console.error(`[${new Date().toISOString()}] Error: ${exception.stack}`);
+              }
 
               response.status(status).json({
                      code: status,

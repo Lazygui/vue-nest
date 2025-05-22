@@ -31,7 +31,7 @@ export class UserEntity {
 
 
        @IsOptional()
-       @Column({ unique: true, nullable: false, comment: '身份证号' })
+       @Column({ unique: true, nullable: true, comment: '身份证号' })
        id_card: string;
 
 

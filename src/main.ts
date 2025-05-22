@@ -22,7 +22,7 @@ async function bootstrap() {
    * 给所有接口添加前缀api
    * 排除html转发接口
    */
-  app.setGlobalPrefix('api', {
+  app.setGlobalPrefix('/api', {
     exclude: ['/'], // 排除根路径
   });
 
