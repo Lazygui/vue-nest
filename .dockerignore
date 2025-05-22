@@ -1,0 +1,5 @@
+# 确保包含以下内容
+node_modules
+dist
+.env
+.DS_Store

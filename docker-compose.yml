@@ -1,0 +1,31 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  html-forwarder:
+    build: .
+    ports:
+      - "9050:9050"
+    volumes:
+      - ./wwwroot:/app/wwwroot
+    env_file: .env  # 统一加载环境变量文件
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: always
+
+  postgresql:
+    image: postgres:15-alpine
+    env_file: .env  # 复用同一个环境变量文件
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432" # 暴露端口到宿主机(如有需要)
+
+volumes:
+  pgdata:
