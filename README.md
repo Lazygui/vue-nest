@@ -11,7 +11,7 @@ src/
 ├── app.controller.spec.ts     # App控制器单元测试文件
 ├── app.controller.ts          # 根控制器，通常处理基础路由
 ├── app.module.ts              # 根模块，组织所有功能模块
-├── main.ts                    # 应用入口文件,设置服务端口,除'/'路由之外的路由均添加api前缀(/api/user/**)
+├── main.ts                    # 应用入口文件,设置服务端口,全局校验器，除'/'路由之外的路由均添加api前缀(/api/user/**)
 └── config
     ├── config.controller.ts   # 配置控制器，TypeOrm连接配置、env文件等
 ```
