@@ -18,7 +18,6 @@ async function bootstrap() {
       return new BadRequestException('参数错误');
     },
   }));
-  createSwaggerDocument(app)
   /**
    * 给所有接口添加前缀api
    * 排除html转发接口
@@ -26,11 +25,13 @@ async function bootstrap() {
   app.setGlobalPrefix('api', {
     exclude: ['/'], // 排除根路径
   });
+
   // 注册全局拦截器
   app.useGlobalInterceptors(new TransformInterceptor());
 
   // 注册全局过滤器
   app.useGlobalFilters(new HttpExceptionFilter());
+  createSwaggerDocument(app)
   await app.listen(process.env.PORT ?? 9050);
 }
 void bootstrap();

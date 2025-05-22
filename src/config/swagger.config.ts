@@ -4,6 +4,7 @@ const swaggerConfig = new DocumentBuilder()
        .setTitle('API 文档')
        .setDescription('系统接口文档')
        .setVersion('1.0')
+       .setBasePath('api')
        .addBearerAuth({
               type: 'http',
               scheme: 'bearer',
@@ -15,6 +16,7 @@ const swaggerConfig = new DocumentBuilder()
 export const createSwaggerDocument = app => {
        // 创建文档
        const document = SwaggerModule.createDocument(app, swaggerConfig)
+
        // 设置文档
        SwaggerModule.setup('docs', app, document)
 }
