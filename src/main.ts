@@ -7,6 +7,7 @@ import { HttpExceptionFilter } from './interceptor/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  //验证器，仅处理第一个错误
   app.useGlobalPipes(new ValidationPipe({
     exceptionFactory: (errors) => {
       const firstError = errors[0];

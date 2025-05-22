@@ -6,12 +6,12 @@ import { UserService } from './user.service'
 @Controller('user')
 export class UserController {
     constructor(private readonly userService: UserService) { }
-    @Post('user-list')
+    @Post('list')
     getList(@Body() body: UserList) {
         return this.userService.findAll();;
     }
 
-    @Post('user-add')
+    @Post('add')
     addUser(@Body() body: UserAdd) {
         return this.userService.create(body);
     }
