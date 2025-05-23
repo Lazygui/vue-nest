@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional } from "class-validator";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('user')
 export class UserEntity {
@@ -38,4 +38,8 @@ export class UserEntity {
        @IsOptional()
        @Column({ unique: true, nullable: false, comment: '手机号' })
        phone: string;
+
+       @DeleteDateColumn()
+       @Column({ unique: false, nullable: true, comment: '软删除标志' })
+       user_deletedAt: Date;
 }
