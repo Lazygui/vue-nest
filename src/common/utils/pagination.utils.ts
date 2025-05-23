@@ -6,9 +6,22 @@ import { Repository, FindManyOptions, ObjectLiteral, FindOptionsOrder, Like } fr
  * @param repository TypeORM 的 Repository 实例
  * @param page 当前页码，默认值为 1
  * @param limit 每页记录数，默认值为 10
- * @param options 其他查询选项（如 where 条件、relations 等）
  * @param sortBy 排序字段，默认值为 'update_time'
  * @param order 排序方式，默认值为 'ASC'
+ * @param options 其他查询选项，支持以下参数：
+ *   - **where**: `Object`，指定查询条件，用于过滤数据。例如：`where: { name: 'John' }`。
+ *   - **select**: `string[]`，指定返回的字段。例如：`select: ['id', 'name']`。
+ *   - **relations**: `string[]`，加载关联实体。例如：`relations: ['profile']`。
+ *   - **cache**: `boolean` 或 `number`，启用查询缓存。例如：`cache: true`。
+ *   - **withDeleted**: `boolean`，是否包含软删除的记录。例如：`withDeleted: true`。
+ *   - **loadRelationIds**: `boolean`，查询结果会包含关联实体的 ID，而不是完整的关联实体。例如：`loadRelationIds: true`。
+ *   - **loadEagerRelations**: `boolean`，是否加载使用 `@Eager（用于标记某些关联实体是否总是需要自动加载的装饰器） `注解的关联实体。例如：`loadEagerRelations: true`。
+ *   - **join**: `Object`，指定 JOIN 查询。例如：`join: { alias: 'user', leftJoinAndSelect: { profile: 'user.profile' } }`。
+ *   - **comment**: `string`，在生成的 SQL 查询中添加注释。例如：`comment: 'This is a test query'`。
+ *   - **lock**: `Object`，锁定查询结果。例如：`lock: { mode: 'pessimistic_write' }`。
+ *   - **relationsLoadStrategy**: `'join' | 'query'`，指定加载关联实体的策略。例如：`relationsLoadStrategy: 'join'`。
+ *   - **relationLoadStrategy**: `'join' | 'query'`，与 `relationsLoadStrategy` 相同，用于兼容性。
+ *   - **relationPreloadStrategy**: `'join' | 'query'`，与 `relationsLoadStrategy` 相同，用于兼容性。
  * @returns 包含数据列表和总数的对象
  */
 export async function paginate<T extends ObjectLiteral>(
