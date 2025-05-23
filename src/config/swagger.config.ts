@@ -4,7 +4,6 @@ const swaggerConfig = new DocumentBuilder()
        .setTitle('API 文档')
        .setDescription('系统接口文档')
        .setVersion('1.0')
-       .setBasePath('api')
        .addBearerAuth({
               type: 'http',
               scheme: 'bearer',

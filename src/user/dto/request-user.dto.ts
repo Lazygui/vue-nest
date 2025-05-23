@@ -29,6 +29,24 @@ export class UserList {
        @IsOptional()
        @IsString()
        id_card: string
+
+       @ApiProperty({
+              name: 'phone',
+              description: '电话号码',
+              type: String,
+       })
+       @IsOptional()
+       @IsString()
+       phone: string
+
+       @ApiProperty({
+              name: 'user_id',
+              description: '用户ID',
+              type: Number,
+       })
+       @IsOptional()
+       @IsNumber()
+       user_id: number
 }
 export class UserAdd {
        @ApiProperty({ uniqueItems: true, description: '手机号' })

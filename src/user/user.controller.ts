@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { UserList } from './dto/request-user.dto';
-import { UserAdd } from './dto/request-user.dto';
+import { UserList, UserAdd } from './dto/request-user.dto';
 import { UserService } from './user.service'
 
 @Controller('user')
@@ -8,7 +7,8 @@ export class UserController {
     constructor(private readonly userService: UserService) { }
     @Post('list')
     getList(@Body() body: UserList) {
-        return this.userService.findAll();;
+        const { page_index, page_size, id_card, phone, user_id } = body;
+        return this.userService.findPaging(page_index, page_size, { id_card, phone, user_id });;
     }
 
     @Post('add')
