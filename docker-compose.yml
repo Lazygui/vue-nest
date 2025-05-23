@@ -2,7 +2,7 @@
 version: '3.8'
 
 services:
-  html-forwarder:
+  html-nest:
     build: .
     ports:
       - "9050:9050"
@@ -15,7 +15,7 @@ services:
     restart: always
 
   postgresql:
-    image: postgres:15-alpine
+    image: postgres:lastest
     env_file: .env  # 复用同一个环境变量文件
     volumes:
       - pgdata:/var/lib/postgresql/data
