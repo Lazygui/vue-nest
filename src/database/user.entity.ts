@@ -15,7 +15,7 @@ export class UserEntity extends BaseEntity {
        @Column({ type: 'varchar', unique: false, nullable: false, comment: '密码' })
        password: string;
 
-       @Column({ type: 'varchar', unique: false, nullable: false, comment: '昵称' })
+       @Column({ type: 'varchar', unique: false, nullable: false, comment: '用户名' })
        user_name: string;
 
        @Column({ type: 'varchar', unique: true, nullable: true, comment: '身份证号' })

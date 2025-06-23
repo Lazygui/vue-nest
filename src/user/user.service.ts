@@ -10,6 +10,10 @@ export class UserService {
               @InjectRepository(UserEntity)
               private readonly userRepository: Repository<UserEntity>,
        ) { }
+       async addUser(createUserDto: Partial<UserEntity>) {
+              const user = this.userRepository.create(createUserDto);
+              return await this.userRepository.save(user);
+       }
 
        async findAll() {
               return await this.userRepository.find();

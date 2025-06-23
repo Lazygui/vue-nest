@@ -6,10 +6,8 @@ import { SignUp } from './dto/request-auth.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  //TODO 注册
-  @Post('sign-up')
+  @Post('signUp-phone')
   signUp(@Body() createAuthDto: SignUp) {
-    return this.authService.signUp(createAuthDto);
+    return this.authService.signUpPhone(createAuthDto);
   }
-
 }
