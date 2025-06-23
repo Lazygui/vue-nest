@@ -12,7 +12,7 @@ export class AuthService {
   async signUpPhone(createAuthDto: SignUp) {
     const addUser = { ...createAuthDto, user_name: createAuthDto.phone }
     const user = await this.usersService.addUser(addUser);
-    const payload = { sub: user.user_id, username: user.user_name };
+    const payload = { sub: user.user_id, username: user.user_name, phone: user.phone };
     return {
       access_token: await this.jwtService.signAsync(payload)
     }
