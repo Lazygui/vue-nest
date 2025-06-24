@@ -18,7 +18,7 @@ export class AuthService {
     private cryptoService: CryptoService
   ) { }
   async signUpPhone(createAuthDto: SignUp) {
-    const addUser = { ...createAuthDto, user_name: createAuthDto.phone.toString() }
+    const addUser = { ...createAuthDto, user_name: createAuthDto.phone }
     const user = await this.usersService.addUser(addUser);
     const payload = { sub: user.user_id, username: user.user_name, phone: user.phone };
     return {
