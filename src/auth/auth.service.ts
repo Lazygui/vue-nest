@@ -2,13 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SignUp } from './dto/request-auth.dto';
 import { UserEntity } from '@db/user.entity'
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserService } from '@/user/user.service';
+import { UserService } from '@controller/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { findOneData } from "@common/utils/pagination.utils"
 import { Repository } from 'typeorm';
-import * as crypto from 'crypto';
 import { CryptoService } from './crypto.service';
-import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class AuthService {

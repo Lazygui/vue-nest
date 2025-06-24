@@ -2,8 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { createSwaggerDocument } from './config/swagger.config';
-import { TransformInterceptor } from './common/interceptor/response.interceptor';
-import { HttpExceptionFilter } from './common/interceptor/http-exception.filter';
+import { TransformInterceptor } from '@interceptor/response.interceptor';
+import { HttpExceptionFilter } from '@filter/http-exception.filter';
 
 
 async function bootstrap() {

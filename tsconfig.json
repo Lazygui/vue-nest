@@ -25,7 +25,16 @@
         "src/common/*"
       ],
       "@db/*": [
-        "src/database/*"
+        "src/entity/*"
+      ],
+      "@interceptor/*": [
+        "src/interceptor/*"
+      ],
+      "@filter/*": [
+        "src/filter/*"
+      ],
+      "@controller/*": [
+        "src/controller/*"
       ]
     }
   }
