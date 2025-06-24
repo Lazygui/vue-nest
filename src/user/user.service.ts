@@ -19,7 +19,9 @@ export class UserService {
               return await this.userRepository.find();
        }
 
-
+       async findOne(where: any) {
+              return await this.userRepository.findOne({ where });
+       }
        /**
         * 分页查询
         * @param pageIndex 页码

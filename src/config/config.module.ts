@@ -26,6 +26,5 @@ const env = process.env.NODE_ENV || 'development';
                      })
               })
        ],
-       exports: [NestConfigModule]
 })
 export class ConfigModule { }

@@ -3,9 +3,7 @@ import { AuthService } from './auth.service';
 import { UserModule } from '@/user/user.module';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-const jwtConstants = {
-  secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
-};
+import { CryptoService } from './crypto.service';
 @Module({
   imports: [
     UserModule,
@@ -16,6 +14,6 @@ const jwtConstants = {
     })
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, CryptoService],
 })
 export class AuthModule { }
