@@ -5,7 +5,7 @@ import { IsNotEmpty, IsString, ValidationOptions, IsNumber, IsBoolean, IsDate, I
 /**
  * DtoValid 装饰器的配置选项
  */
-export interface DtoValidOptions {
+interface DtoValidOptions {
        /** 属性名称（用于标识） */
        name: string;
        /** 属性描述（用于 Swagger 文档和验证消息） */
@@ -78,3 +78,9 @@ export function DtoValid(options: DtoValidOptions): PropertyDecorator {
 
        return applyDecorators(...decorators);
 }
+
+
+import { SetMetadata } from '@nestjs/common';
+
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);

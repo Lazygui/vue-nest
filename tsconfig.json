@@ -35,6 +35,9 @@
       ],
       "@controller/*": [
         "src/controller/*"
+      ],
+      "@guard/*": [
+        "src/guard/*"
       ]
     }
   }
