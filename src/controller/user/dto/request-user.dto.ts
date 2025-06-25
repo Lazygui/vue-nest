@@ -1,5 +1,5 @@
 
-import { DtoValid } from "@common/decorators/dto-valid.decorator"
+import { DtoValid } from "@/common/decorators/dto-valid.decorator"
 export class UserList {
        @DtoValid({ name: 'page_index', description: '页码', type: Number })
        page_index: number;

@@ -21,23 +21,8 @@
       "@/*": [
         "src/*"
       ],
-      "@common/*": [
-        "src/common/*"
-      ],
-      "@db/*": [
-        "src/entity/*"
-      ],
-      "@interceptor/*": [
-        "src/interceptor/*"
-      ],
-      "@filter/*": [
-        "src/filter/*"
-      ],
       "@controller/*": [
         "src/controller/*"
-      ],
-      "@guard/*": [
-        "src/guard/*"
       ]
     }
   }

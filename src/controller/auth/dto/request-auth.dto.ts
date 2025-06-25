@@ -1,5 +1,5 @@
 
-import { DtoValid } from "@common/decorators/dto-valid.decorator"
+import { DtoValid } from "@/common/decorators/dto-valid.decorator"
 import { IsPhoneNumber, Matches } from "class-validator"
 export class SignUp {
        @DtoValid({ name: 'phone', description: '电话号码', type: String })

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from '@db/user.entity'
+import { UserEntity } from '@/entity/user.entity'
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { paginate } from "@common/utils/pagination.utils"
+import { paginate } from "@/common/utils/pagination.utils"
 import { Public } from '@/common/decorators/dto-valid.decorator';
 
 @Injectable()
