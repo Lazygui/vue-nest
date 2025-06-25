@@ -10,7 +10,7 @@ export class TransformInterceptor implements NestInterceptor {
 
               return next.handle().pipe(
                      map(data => ({
-                            statusCode: response.statusCode, // 动态获取状态码
+                            code: response.statusCode, // 动态获取状态码
                             message: 'success',
                             data,
                      })),

@@ -14,7 +14,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
               let message = 'Internal server error';
               if (exception instanceof HttpException) {
                      status = exception.getStatus();
-                     message = exception.message;
+                     const response = exception.getResponse();
+                     message = typeof response === 'string' ? response : response['message'] || 'Unknown error';
               }
 
               // 生产环境建议隐藏堆栈信息
