@@ -4,6 +4,8 @@ import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { createSwaggerDocument } from './config/swagger.config';
 import { TransformInterceptor } from '@/interceptor/response.interceptor';
 import { HttpExceptionFilter } from '@/filter/http-exception.filter';
+import { join } from 'path';
+import * as express from 'express';
 
 
 async function bootstrap() {
@@ -12,8 +14,19 @@ async function bootstrap() {
   });
   // 启用 CORS
   app.enableCors({
-    methods: 'GET,POST'
+    origin: true,
+    methods: 'GET,POST,OPTIONS',
+    allowedHeaders: ['Content-Type', 'Authorization'], // 允许的请求头
+    optionsSuccessStatus: 204,
   });
+  const rootDir = join(__dirname, '..');
+  app.use('/static', express.static(join(rootDir, '/static'), {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.mp4')) {
+        res.setHeader('Content-Type', 'video/mp4');
+      }
+    },
+  }));
   //验证器，仅处理第一个错误
   app.useGlobalPipes(new ValidationPipe({
     exceptionFactory: (errors) => {
@@ -25,14 +38,13 @@ async function bootstrap() {
       }
       return new BadRequestException('参数错误');
     },
+    whitelist: true,
   }));
   /**
    * 给所有接口添加前缀api
    * 排除html转发接口
    */
-  app.setGlobalPrefix('/api', {
-    exclude: ['/'], // 排除根路径
-  });
+  app.setGlobalPrefix('/api');
 
   // 注册全局拦截器
   app.useGlobalInterceptors(new TransformInterceptor());
@@ -40,6 +52,6 @@ async function bootstrap() {
   // 注册全局过滤器
   app.useGlobalFilters(new HttpExceptionFilter());
   createSwaggerDocument(app)
-  await app.listen(process.env.PORT ?? 9050);
+  await app.listen(9050, '0.0.0.0');
 }
 void bootstrap();

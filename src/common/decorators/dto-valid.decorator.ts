@@ -1,7 +1,5 @@
-import { applyDecorators } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, ValidationOptions, IsNumber, IsBoolean, IsDate, IsOptional } from 'class-validator';
-
+import { IsNotEmpty, IsString, ValidationOptions, IsNumber, IsBoolean, IsDate, IsOptional, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator } from 'class-validator';
 /**
  * DtoValid 装饰器的配置选项
  */
@@ -11,7 +9,7 @@ interface DtoValidOptions {
        /** 属性描述（用于 Swagger 文档和验证消息） */
        description: string;
        /** 属性的类型*/
-       type: StringConstructor | NumberConstructor | BooleanConstructor | DateConstructor;
+       type: StringConstructor | NumberConstructor | BooleanConstructor | DateConstructor | 'File' | 'DateNumber';
        /** 是否不能为空，默认为 true */
        isNotEmpty?: boolean;
 }
@@ -47,19 +45,19 @@ interface DtoValidOptions {
  */
 export function DtoValid(options: DtoValidOptions): PropertyDecorator {
        const { description, isNotEmpty = true, type } = options;
-
+       const apiType = type === 'File' ? 'string' :
+              type === 'DateNumber' ? 'number' : // 处理 DateNumber 类型
+                     type // 其他类型保持原样
        const apiPropertyOptions: ApiPropertyOptions = {
               description,
-              type,
-              required: isNotEmpty
+              type: apiType,
+              required: isNotEmpty,
        };
-
        const validationOptions: ValidationOptions = {
               message: `${description}不能为空`,
        };
 
        let validationDecorator: any = () => { };
-
        if (type === String) {
               validationDecorator = IsString();
        } else if (type === Number) {
@@ -68,15 +66,48 @@ export function DtoValid(options: DtoValidOptions): PropertyDecorator {
               validationDecorator = IsBoolean();
        } else if (type === Date) {
               validationDecorator = IsDate();
+       } else if (type === 'DateNumber') {
+              validationDecorator = IsDateNumber();
        }
+       // 如果 type 是 File，则不添加验证装饰器
 
        const decorators = [
               ApiProperty(apiPropertyOptions),
-              isNotEmpty ? IsNotEmpty(validationOptions) : IsOptional(),
-              validationDecorator,
        ];
+       if (type !== 'File') {
+              decorators.push(isNotEmpty ? IsNotEmpty(validationOptions) : IsOptional());
+              decorators.push(validationDecorator);
+       }
 
-       return applyDecorators(...decorators);
+       // return applyDecorators(...decorators);
+       return (target: Object, propertyKey: string | symbol) => {
+              // 应用所有生成的装饰器
+              decorators.forEach(dec => dec(target, propertyKey));
+              // 存储DtoValid的配置到元数据中（键为'dtoValid:options'）
+              Reflect.defineMetadata('dtoValid:options', options, target, propertyKey);
+       };
+}
+@ValidatorConstraint({ name: 'IsDateNumber' })
+class IsDateNumberConstraint implements ValidatorConstraintInterface {
+       validate(value: any): boolean {
+              // 必须是正整数
+              return typeof value === 'number' && Number.isInteger(value) && value > 0;
+       }
+
+       defaultMessage(): string {
+              return '必须是一个有效的正整数时间戳';
+       }
+}
+function IsDateNumber(validationOptions?: ValidationOptions) {
+       return function (object: Object, propertyName: string) {
+              registerDecorator({
+                     target: object.constructor,
+                     propertyName: propertyName,
+                     options: validationOptions,
+                     constraints: [],
+                     validator: IsDateNumberConstraint,
+              });
+       };
 }
 
 
