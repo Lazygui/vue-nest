@@ -30,14 +30,27 @@ async function bootstrap() {
   //验证器，仅处理第一个错误
   app.useGlobalPipes(new ValidationPipe({
     exceptionFactory: (errors) => {
-      const firstError = errors[0];
-      if (firstError.constraints) {
-        const message =
-          firstError.constraints[Object.keys(firstError.constraints)[0]];
-        return new BadRequestException(message);
-      }
-      return new BadRequestException('参数错误');
+      console.log(errors);
+
+      const getFirstErrorMessage = (errors: any[]): string => {
+        for (const error of errors) {
+          if (error.constraints) {
+            return Object.values(error.constraints)[0] as string;
+          }
+          if (error.children && error.children.length > 0) {
+            const childMessage = getFirstErrorMessage(error.children);
+            if (childMessage) {
+              return childMessage;
+            }
+          }
+        }
+        return '参数错误';
+      };
+
+      const message = getFirstErrorMessage(errors);
+      return new BadRequestException(message);
     },
+    transform: true,
     whitelist: true,
   }));
   /**

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, ValidationOptions, IsNumber, IsBoolean, IsDate, IsOptional, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator } from 'class-validator';
+import { Type } from "class-transformer";
+import { IsNotEmpty, IsString, ValidationOptions, IsNumber, IsBoolean, IsDate, IsOptional, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator, IsObject, validate, ValidateNested } from 'class-validator';
 /**
  * DtoValid 装饰器的配置选项
  */
@@ -9,9 +10,11 @@ interface DtoValidOptions {
        /** 属性描述（用于 Swagger 文档和验证消息） */
        description: string;
        /** 属性的类型*/
-       type: StringConstructor | NumberConstructor | BooleanConstructor | DateConstructor | 'File' | 'DateNumber';
+       type: StringConstructor | NumberConstructor | BooleanConstructor | DateConstructor | ObjectConstructor | 'File' | 'DateNumber';
        /** 是否不能为空，默认为 true */
        isNotEmpty?: boolean;
+       // 用于嵌套 DTO 验证
+       dtoClass?: any;
 }
 
 /**
@@ -44,7 +47,7 @@ interface DtoValidOptions {
  * ```
  */
 export function DtoValid(options: DtoValidOptions): PropertyDecorator {
-       const { description, isNotEmpty = true, type } = options;
+       const { description, isNotEmpty = true, type, dtoClass } = options;
        const apiType = type === 'File' ? 'string' :
               type === 'DateNumber' ? 'number' : // 处理 DateNumber 类型
                      type // 其他类型保持原样
@@ -68,6 +71,12 @@ export function DtoValid(options: DtoValidOptions): PropertyDecorator {
               validationDecorator = IsDate();
        } else if (type === 'DateNumber') {
               validationDecorator = IsDateNumber();
+       } else if (type === Object) {
+              validationDecorator = IsObject(); // 新增：对象类型使用 @IsObject()
+              if (dtoClass) {
+                     // ✅ 直接使用 @ValidateNested()，不再手动调用 validate
+                     validationDecorator = ValidateNested();
+              }
        }
        // 如果 type 是 File，则不添加验证装饰器
 
@@ -77,6 +86,9 @@ export function DtoValid(options: DtoValidOptions): PropertyDecorator {
        if (type !== 'File') {
               decorators.push(isNotEmpty ? IsNotEmpty(validationOptions) : IsOptional());
               decorators.push(validationDecorator);
+              if (type === Object && dtoClass) {
+                     decorators.push(Type(() => dtoClass));
+              }
        }
 
        // return applyDecorators(...decorators);
@@ -109,9 +121,3 @@ function IsDateNumber(validationOptions?: ValidationOptions) {
               });
        };
 }
-
-
-import { SetMetadata } from '@nestjs/common';
-
-export const IS_PUBLIC_KEY = 'isPublic';
-export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
