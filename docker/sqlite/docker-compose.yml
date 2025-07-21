@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  nest-app:
+    build: .          # 基于当前目录的 Dockerfile 构建
+    image: nest-app:22.13.1-alpine3.21  # 自定义镜像标签（若用 22-alpine3.21 则改为对应标签）
+    container_name: henan-nest  # 容器名称
+    ports:
+      - "9050:9050"    # 外部端口 9050 映射到容器端口 3000（Nest 默认端口）
+    environment:
+      - NODE_ENV=production  # 生产环境
+      - PORT=9050            # 容器内端口（与 EXPOSE 一致）
+    networks:
+      - nest-network         # 加入自定义网络
+
+networks:
+  nest-network:
+    driver: bridge          # 桥接网络（默认）
