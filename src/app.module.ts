@@ -26,18 +26,18 @@ import { join } from 'path';
       exclude: ['/api/*'],
       serveRoot: '/static'
     }),
-    TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: 'postgres',
-        host: process.env.DB_HOST, // 数据库机地址
-        port: +process.env.DB_PORT!,
-        username: process.env.DB_USERNAME,
-        password: process.env.POSTGRES_PASSWORD,
-        database: process.env.DB_DATABASE,
-        synchronize: true,             // 开发环境开启自动同步
-        autoLoadEntities: true,
-      })
-    }),
+    // TypeOrmModule.forRootAsync({
+    //   useFactory: () => ({
+    //     type: 'postgres',
+    //     host: process.env.DB_HOST, // 数据库机地址
+    //     port: +process.env.DB_PORT!,
+    //     username: process.env.DB_USERNAME,
+    //     password: process.env.POSTGRES_PASSWORD,
+    //     database: process.env.DB_DATABASE,
+    //     synchronize: true,             // 开发环境开启自动同步
+    //     autoLoadEntities: true,
+    //   })
+    // }),
     // TypeOrmModule.forRootAsync({
     //   useFactory: (config: ConfigService) => {
     //     console.log('===== 环境变量 =====');
