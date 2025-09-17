@@ -2,8 +2,8 @@
 import { BadRequestException } from '@nestjs/common';
 import * as fs from 'fs/promises';
 import { join } from 'path';
-import { DataSource, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import type { Multer } from 'multer'; // 引入 Multer 类型
 interface FileOptions {
        isEmpty?: boolean;
        targetDir?: string
@@ -15,7 +15,7 @@ interface FileOptions {
  * @returns 保存后的文件完整路径
  * @throws 如果文件保存失败会抛出异常
  */
-export async function saveUploadedFile(file: Express.Multer.File | undefined, options: FileOptions = { isEmpty: false }): Promise<string | undefined> {
+export async function saveUploadedFile(file: Multer.File | undefined, options: FileOptions = { isEmpty: false }): Promise<string | undefined> {
 
        if (options.isEmpty && !file) {
               return undefined
@@ -24,12 +24,14 @@ export async function saveUploadedFile(file: Express.Multer.File | undefined, op
               throw new BadRequestException('文件不能为空');
        }
        const filename = `${uuidv4()}.${file!.mimetype.split('/')[1]}`;
-       // 目标目录，相对于项目根目录的 'static' 目录
-       // 如果 options.targetDir 提供了，就使用它（也应该是相对于 'static' 的路径）
-       let targetDir = 'static'; // 默认为空，表示直接放在 static 目录下
-
+       // 目标目录，相对于项目根目录的 'public/static' 目录
+       let targetDir = 'public/static';
        if (options.targetDir) {
-              targetDir = options.targetDir; // 例如 'images' 或 'videos'，将创建 static/images 或 static/videos
+              if (options.targetDir.startsWith('./')) {
+                     targetDir = join(targetDir, options.targetDir);
+              } else {
+                     targetDir = options.targetDir;
+              }
        }
 
        // 构建相对于 static 目录的文件路径
@@ -49,9 +51,7 @@ export async function saveUploadedFile(file: Express.Multer.File | undefined, op
        try {
               // 写入文件到绝对路径
               await fs.writeFile(absoluteFilePath, file.buffer);
-              // 返回相对路径，这样前端可以拼接成完整的URL
-              // 前端URL将是: http://localhost:9050/static/[targetDir]/[filename]
-              return relativeFilePath;
+              return relativeFilePath.replace(/^public[\\/]/, '')
        } catch (err) {
               console.error('文件写入失败:', err);
               throw new BadRequestException('文件保存失败');;
