@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger';
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsString, ValidationOptions, IsNumber, IsBoolean, IsDate, IsOptional, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator, IsObject, validate, ValidateNested } from 'class-validator';
+import { IsNotEmpty, IsString, ValidationOptions, IsNumber, IsArray, IsBoolean, IsDate, IsOptional, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator, IsObject, validate, ValidateNested } from 'class-validator';
 /**
  * DtoValid 装饰器的配置选项
  */
@@ -10,7 +10,7 @@ interface DtoValidOptions {
        /** 属性描述（用于 Swagger 文档和验证消息） */
        description: string;
        /** 属性的类型*/
-       type: StringConstructor | NumberConstructor | BooleanConstructor | DateConstructor | ObjectConstructor | 'File' | 'DateNumber';
+       type: StringConstructor | NumberConstructor | BooleanConstructor | DateConstructor | ObjectConstructor | ArrayConstructor | 'File' | 'DateNumber';
        /** 是否不能为空，默认为 true */
        isNotEmpty?: boolean;
        // 用于嵌套 DTO 验证
@@ -25,9 +25,11 @@ interface DtoValidOptions {
  * @returns PropertyDecorator
  *
  * 功能：
- * 1. 根据 `type` 自动应用类型验证装饰器（如 `@IsString()`、`@IsNumber()` 等）。
+ * 1. 根据 `type` 自动应用类型验证装饰器（如 `@IsString()`、`@IsNumber()` 等）'File' 类型使用不添加验证器，DateNumber 类型使用自定义验证器。
  * 2. 根据 `isNotEmpty` 决定是否应用 `@IsNotEmpty()` 或 `@IsOptional()`。
  * 3. 自动生成 Swagger 文档（`@ApiProperty`）。
+ * 4. 添加嵌套 DTO 验证（如果需要）。
+ * 5. 存储 DtoValid 的配置到元数据中，用于后续处理。
  *
  * 示例：
  * ```typescript
@@ -43,6 +45,10 @@ interface DtoValidOptions {
  *
  *   @DtoValid({ name: 'createdAt', description: '创建时间', isNotEmpty: false, type: Date })
  *   createdAt: Date;
+ * 
+ *   *需要配合controller使用@FileValidation自定义装饰器
+ *   @DtoValid({ name: 'createdAt', description: '头像', type: 'Files' }) 
+ *   createdAt: Express.Multer.File;
  * }
  * ```
  */
@@ -50,7 +56,7 @@ export function DtoValid(options: DtoValidOptions): PropertyDecorator {
        const { description, isNotEmpty = true, type, dtoClass } = options;
        const apiType = type === 'File' ? 'string' :
               type === 'DateNumber' ? 'number' : // 处理 DateNumber 类型
-                     type // 其他类型保持原样
+                     type// 其他类型保持原样
        const apiPropertyOptions: ApiPropertyOptions = {
               description,
               type: apiType,
@@ -71,12 +77,15 @@ export function DtoValid(options: DtoValidOptions): PropertyDecorator {
               validationDecorator = IsDate();
        } else if (type === 'DateNumber') {
               validationDecorator = IsDateNumber();
+       } else if (type === Array) {
+              validationDecorator = IsArray();
        } else if (type === Object) {
               validationDecorator = IsObject(); // 新增：对象类型使用 @IsObject()
               if (dtoClass) {
                      // ✅ 直接使用 @ValidateNested()，不再手动调用 validate
                      validationDecorator = ValidateNested();
               }
+
        }
        // 如果 type 是 File，则不添加验证装饰器
 

@@ -1,4 +1,5 @@
-import { Catch, ExceptionFilter, HttpException, ArgumentsHost, Inject } from '@nestjs/common';
+import { Catch, ExceptionFilter, HttpException, ArgumentsHost, Inject, HttpStatus, BadRequestException } from '@nestjs/common';
+import { AxiosError } from 'axios';
 import { Response } from 'express';
 import { QueryFailedError, getMetadataArgsStorage } from 'typeorm';
 
@@ -9,7 +10,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
               this.buildFieldMeaningMap()
        }
        catch(exception: Error, host: ArgumentsHost) {
-              const timestamp = new Date().toISOString()
+              const timestamp = new Date().toISOString().replace('T', ' ').replace(/\..+/, '');
               const ctx = host.switchToHttp();
               const response = ctx.getResponse<Response>();
               const request = ctx.getRequest(); // 获取请求对象
@@ -17,7 +18,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
               let status = 500;
               let message = 'Internal server error';
+
               if (exception instanceof HttpException) {
+
                      status = exception.getStatus();
 
                      const response = exception.getResponse();
@@ -26,15 +29,23 @@ export class HttpExceptionFilter implements ExceptionFilter {
                             const regex = /UNIQUE constraint failed: (.+)/;
                             const match = response['message'].match(regex);
                             message = `${this.fieldMeaningMap[match![1]] || match![1] || '字段'} 已存在`
+                     } else if (response['error']) {
+                            if (response['error'] === 'Payload Too Large') {
+                                   message = '资源过大'
+                            }
                      }
+
               } else if (exception instanceof QueryFailedError) {
                      message = this.handleQueryFailedError(exception);
+              } else if (exception instanceof AxiosError) {
+                     status = 502; // Bad Gateway
+                     message = this.handleAxiosError(exception)
+              } else {
+                     message = exception.message || 'Internal server error';
               }
 
-              // 生产环境建议隐藏堆栈信息
-              if (process.env.NODE_ENV !== 'production') {
-                     console.error(`[${timestamp}] Error: ${exception.stack}`);
-              }
+              console.error(`[${timestamp}] ${status}: ${message}`);
+
 
               response.status(status).json({
                      code: status,
@@ -43,11 +54,34 @@ export class HttpExceptionFilter implements ExceptionFilter {
                      message,
               });
        }
+
        /**
-           * 处理 QueryFailedError 的私有方法
-           * @param exception QueryFailedError 实例
-           * @returns 包含状态码和错误信息的对象
+           * 处理 AxiosError 的私有方法
+           * @param exception AxiosError 实例
+           * @returns 错误信息
            */
+       private handleAxiosError(exception: AxiosError): string {
+              let info = '';
+              // 处理 SQLite 错误码
+              switch (exception.code) {
+                     case 'ETIMEDOUT':
+                            info = '请求超时'
+                            break
+                     case 'EAI_AGAIN':
+                            info = '无法解析服务地址（DNS 错误）'
+                            break
+                     default:
+                            info = '无法连接到服务，请稍后再试';
+                            break
+              }
+
+              return info
+       }
+       /**
+                  * 处理 QueryFailedError 的私有方法
+                  * @param exception QueryFailedError 实例
+                  * @returns 错误信息
+                  */
        private handleQueryFailedError(exception: QueryFailedError): string {
               const driverError = exception.driverError as unknown as { errno: number; message: string };
               const errorCode = driverError.errno;
@@ -80,7 +114,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
               return info
        }
-
        private buildFieldMeaningMap(): void {
               const metadata = getMetadataArgsStorage();
               const fieldMeaningMap: { [key: string]: string } = {};

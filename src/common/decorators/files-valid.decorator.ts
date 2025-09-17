@@ -15,7 +15,7 @@ interface FileFieldConfig {
  * 文件上传选项接口
  */
 interface FileOptions {
-       limits?: number;         // 文件大小限制（单位：MB，默认 10MB）
+       limits?: number;         // 文件大小限制（单位：MB，默认 30MB）
 }
 
 /**
@@ -43,7 +43,7 @@ export function FileValidation(
 
        // 构建 Multer 的 limits 配置
        const multerLimits = {
-              fileSize: 1024 * 1024 * (options?.limits || 10), // 默认 10MB
+              fileSize: 1024 * 1024 * (options?.limits || 30), // 默认 30MB
        };
 
        return applyDecorators(
